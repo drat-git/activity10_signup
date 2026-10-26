@@ -35,6 +35,37 @@ class _SignupPageState extends State<SignupPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
+  final String _tipCategory = 'password_help';
+  final Map<String, List<String>> _tips = {
+    'password_help': [
+      'Use a long password that you do not use for another account.',
+      'A password manager can help you create and remember different passwords.',
+      'Avoid using your name, birthday, or other easy-to-guess details in a password.',
+    ],
+  };
+  int _nextTip = 0;
+  bool _tipLoading = false;
+  String? _tip;
+
+  Future<void> _getTip() async {
+    if (_tipLoading) return;
+    setState(() {
+      _tipLoading = true;
+      _tip = null;
+    });
+
+    await Future<void>.delayed(const Duration(milliseconds: 600));
+    if (!mounted) return;
+
+    // Tips only use the fixed category, never the form controllers.
+    final tips = _tips[_tipCategory]!;
+    setState(() {
+      _tip = tips[_nextTip];
+      _nextTip = (_nextTip + 1) % tips.length;
+      _tipLoading = false;
+    });
+  }
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -149,6 +180,32 @@ class _SignupPageState extends State<SignupPage> {
                 ),
                 child: const Text('Sign Up', style: TextStyle(fontSize: 18)),
               ),
+              const SizedBox(height: 24),
+              const Divider(),
+              const Text(
+                'Local signup tips',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Preset demo content. No live AI model is called. '
+                'Tips do not check or approve your signup.',
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton(
+                onPressed: _tipLoading ? null : () => _getTip(),
+                child: const Text('Get a signup tip'),
+              ),
+              if (_tipLoading) ...[
+                const SizedBox(height: 12),
+                const CircularProgressIndicator(),
+                const Text('Loading demo tip...'),
+              ],
+              if (_tip != null) ...[
+                const SizedBox(height: 12),
+                Text(_tip!, key: const Key('tipText')),
+              ],
             ],
           ),
         ),
