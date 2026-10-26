@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 void main() {
@@ -12,7 +11,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Fun Signup App',
+      title: 'Snack Club Signup',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.purple),
       home: const SignupPage(),
     );
@@ -29,31 +29,44 @@ class SignupPage extends StatefulWidget {
 class _SignupPageState extends State<SignupPage> {
   // 🔑 The Global Key - acts like a remote control for the form
   final _formKey = GlobalKey<FormState>();
-  
+
   // 📝 Controllers to track what the user types
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold( // 👨 Parent
+    return Scaffold(
+      // 👨 Parent
       appBar: AppBar(
-        title: const Text('Join Us Today for the Cash Money!'),
+        title: const Text('Snack Club'),
+        foregroundColor: Colors.white,
         backgroundColor: Colors.purple,
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
-        child: Form( // 👶 Child
+        child: Form(
+          // 👶 Child
           key: _formKey,
           child: Column(
             children: [
+              const Icon(Icons.cookie, color: Colors.purple, size: 36),
+              const SizedBox(height: 8),
               const Text(
-                'Create Your Account',
+                'Join the Snack Club',
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
-              
+
               // 👤 Name Field
               TextFormField(
                 controller: _nameController,
@@ -70,7 +83,7 @@ class _SignupPageState extends State<SignupPage> {
                 },
               ),
               const SizedBox(height: 16),
-              
+
               // 📧 Email Field
               TextFormField(
                 controller: _emailController,
@@ -90,7 +103,7 @@ class _SignupPageState extends State<SignupPage> {
                 },
               ),
               const SizedBox(height: 16),
-              
+
               // 🔒 Password Field
               TextFormField(
                 controller: _passwordController,
@@ -111,14 +124,16 @@ class _SignupPageState extends State<SignupPage> {
                 },
               ),
               const SizedBox(height: 24),
-              
+
               // 🚀 Sign Up Button
               ElevatedButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('Demo signup complete — your form passed validation!'),
+                        content: Text(
+                          'Demo signup complete — your form passed validation!',
+                        ),
                         backgroundColor: Colors.green,
                       ),
                     );
@@ -126,12 +141,13 @@ class _SignupPageState extends State<SignupPage> {
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.purple,
-                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 40,
+                    vertical: 12,
+                  ),
                 ),
-                child: const Text(
-                  'Sign Up',
-                  style: TextStyle(fontSize: 18),
-                ),
+                child: const Text('Sign Up', style: TextStyle(fontSize: 18)),
               ),
             ],
           ),
