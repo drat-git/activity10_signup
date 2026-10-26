@@ -45,12 +45,14 @@ class _SignupPageState extends State<SignupPage> {
   };
   int _nextTip = 0;
   bool _tipLoading = false;
+  bool _tipError = false;
   String? _tip;
 
-  Future<void> _getTip() async {
+  Future<void> _getTip({bool testError = false}) async {
     if (_tipLoading) return;
     setState(() {
       _tipLoading = true;
+      _tipError = false;
       _tip = null;
     });
 
@@ -58,10 +60,14 @@ class _SignupPageState extends State<SignupPage> {
     if (!mounted) return;
 
     // Tips only use the fixed category, never the form controllers.
-    final tips = _tips[_tipCategory]!;
+    final tips = testError ? <String>[] : (_tips[_tipCategory] ?? <String>[]);
     setState(() {
-      _tip = tips[_nextTip];
-      _nextTip = (_nextTip + 1) % tips.length;
+      if (tips.isEmpty) {
+        _tipError = true;
+      } else {
+        _tip = tips[_nextTip];
+        _nextTip = (_nextTip + 1) % tips.length;
+      }
       _tipLoading = false;
     });
   }
@@ -197,6 +203,10 @@ class _SignupPageState extends State<SignupPage> {
                 onPressed: _tipLoading ? null : () => _getTip(),
                 child: const Text('Get a signup tip'),
               ),
+              TextButton(
+                onPressed: _tipLoading ? null : () => _getTip(testError: true),
+                child: const Text('Test tip error'),
+              ),
               if (_tipLoading) ...[
                 const SizedBox(height: 12),
                 const CircularProgressIndicator(),
@@ -205,6 +215,17 @@ class _SignupPageState extends State<SignupPage> {
               if (_tip != null) ...[
                 const SizedBox(height: 12),
                 Text(_tip!, key: const Key('tipText')),
+              ],
+              if (_tipError) ...[
+                const SizedBox(height: 12),
+                const Text(
+                  'Demo tip could not load. Tap Retry to try again.',
+                  style: TextStyle(color: Colors.red),
+                ),
+                OutlinedButton(
+                  onPressed: () => _getTip(),
+                  child: const Text('Retry'),
+                ),
               ],
             ],
           ),
